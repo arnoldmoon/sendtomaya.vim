@@ -78,20 +78,11 @@ with open(tmp_path, 'w', encoding="utf-8") as f:
 # second step: generate command to execute in maya
 code_type = vim.eval("b:language")
 if code_type == "python":
-    command = textwrap.dedent('''
-        import __main__
-        import os
-        import maya.OpenMaya as om
-
-        temp = os.path.abspath(r"{0}")
-        code_type = "{1}"
-
-        with open(temp, "r") as f:
-            exec(f, __main__.__dict__, __main__.__dict__)
-        os.remove(temp)
-    '''.format(tmp_path, code_type))
-    command = command.replace("\\", "/").replace('"', r'\"').replace("\n", "\\n")
-    command = 'python("{}")'.format(command)
+    command = (
+        'import os;'
+        'filepath = os.path.abspath(r"{0}");'
+        'exec(open(filepath).read());'
+        'os.remove(filepath)'.format(tmp_path))
 
 elif code_type == "mel":
     command = textwrap.dedent('''source "{0}";sysFile -delete "{0}"'''.format(tmp_path))
@@ -117,7 +108,9 @@ except Exception:
     traceback.print_exc()
     print("send to maya failed")
 
-sk.close()
+finally:
+    sk.close()
+
 EOF
 endfunction
 
