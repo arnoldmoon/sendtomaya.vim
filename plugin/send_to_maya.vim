@@ -108,7 +108,7 @@ function! s:generic_send_to_maya_op(type, vmode, codetype)
     if get(g:, 'send_to_maya_need_repeat', 0)
       execute range . g:send_to_maya_last_command
     else
-      execute range . "call send_to_maya#send('<bang>' == '!', vmode, '')"
+      execute range . "call send_to_maya#send('<bang>' == '!', vmode, "a:codetype", '')"
     end
     call s:set_repeat()
   finally
